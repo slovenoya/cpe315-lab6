@@ -1,6 +1,3 @@
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -13,20 +10,24 @@ public class FileParser {
 
   public void readAll() {
     Scanner scanner = new Scanner(stream);
+    Cache c1 = new Cache(2, 1, 1);
+    Cache c2 = new Cache(2, 1, 2);
+    Cache c3 = new Cache(2, 1, 4);
+    Cache c4 = new Cache(2, 2, 1);
+    Cache c5 = new Cache(2, 4, 1);
+    Cache c6 = new Cache(2, 4, 4);
+    Cache c7 = new Cache(4, 1, 1);
     while (scanner.hasNext()) {
       scanner.next();
-      Integer.parseInt(scanner.next(), 16);
+      int addr = Integer.parseInt(scanner.next(), 16);
+      c1.store(addr);
+      c2.store(addr);
+      c3.store(addr);
+      c4.store(addr);
+      c5.store(addr);
+      c6.store(addr);
+      c7.store(addr);
     }
     scanner.close();
-  }
-
-  public static void main(String args[]) {
-    File file = new File("tests/mem_stream.1");
-    try (InputStream stream = new FileInputStream(file)) {
-      FileParser parser = new FileParser(stream);
-      parser.readAll();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }
