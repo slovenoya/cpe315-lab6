@@ -5,7 +5,7 @@ import java.io.File;
 
 public class lab6 {
   public static void main(String args[]) {
-    File file = new File("tests/mem_stream.1");
+    File file = new File("tests/mem_stream.2");
     try (InputStream stream = new FileInputStream(file)) {
       FileParser parser = new FileParser(stream);
       parser.readAll();

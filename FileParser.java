@@ -20,14 +20,21 @@ public class FileParser {
     while (scanner.hasNext()) {
       scanner.next();
       int addr = Integer.parseInt(scanner.next(), 16);
-      c1.store(addr);
-      c2.store(addr);
-      c3.store(addr);
+      c1.storeDirect(addr);
+      c2.storeDirect(addr);
+      c3.storeDirect(addr);
       c4.store(addr);
       c5.store(addr);
       c6.store(addr);
-      c7.store(addr);
+      c7.storeDirect(addr);
     }
     scanner.close();
+    c1.printCache(1);
+    c2.printCache(2);
+    c3.printCache(3);
+    c4.printCache(4);
+    c5.printCache(5);
+    c6.printCache(6);
+    c7.printCache(7);
   }
 }
