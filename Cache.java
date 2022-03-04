@@ -7,7 +7,7 @@ public class Cache {
   private int maxIndex;
   private int miss = 0;
   private int hit = 0;
-  private final int LHR;
+  private final int LRU;
   private static final int WORD_PER_KB = 256;
   private static final int BITS_PER_WORD = 32;
   private static final int BYTE_PER_WORD = 4;
@@ -24,7 +24,7 @@ public class Cache {
     this.blockSizeInWord = blockSizeInWord;
     this.blockSizeInBits = blockSizeInWord * BITS_PER_WORD;
     this.associativity = associativity;
-    this.LHR = associativity;
+    this.LRU = associativity;
     this.maxIndex = this.sizeInWord / (this.blockSizeInWord * associativity);
     mem = new int[this.maxIndex][associativity + 1];
   }
@@ -39,7 +39,7 @@ public class Cache {
     for (int i = 0; i < this.associativity; i++) {
       if (mem[index][i] == 0) {
         mem[index][i] = getStorageAddress(address);
-        mem[index][LHR] = i;
+        mem[index][LRU] = i;
         miss++;
         return;
       }
@@ -47,12 +47,12 @@ public class Cache {
     for (int i = 0; i < this.associativity; i++) {
       if (isWithinBlock(index, address, i)) {
         hit++;
-        mem[index][LHR] = i;
+        mem[index] [LRU] = i;
         return;
       } 
     }
-    int lhr = mem[index][this.LHR];
-    mem[index][lhr] = getStorageAddress(address);
+    int LRU = mem[index][this.LRU];
+    mem[index] [LRU] = getStorageAddress(address);
     miss++;
   }
 
