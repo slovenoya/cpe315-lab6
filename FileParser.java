@@ -11,10 +11,10 @@ public class FileParser {
   public void readAll() {
     Scanner scanner = new Scanner(stream);
     Cache c1 = new DirectCache(2, 1);
-    Cache c2 = new AssociativeCache(2, 1, 2);
-    Cache c3 = new AssociativeCache(2, 1, 4);
-    Cache c4 = new DirectCache(2, 2);
-    Cache c5 = new DirectCache(2, 4);
+    Cache c2 = new DirectCache(2, 2);
+    Cache c3 = new DirectCache(2, 4);
+    Cache c4 = new AssociativeCache(2, 2, 1);
+    Cache c5 = new AssociativeCache(2, 4, 1);
     Cache c6 = new AssociativeCache(2, 4, 4);
     Cache c7 = new DirectCache(4, 1);
     while (scanner.hasNext()) {

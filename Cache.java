@@ -6,10 +6,10 @@ public abstract class Cache {
   private int blockSizeInWord;
   private int sizeInKb;
   private int tagShift;
+  private int addressShift;
   private int associativity = 1;
   private int hit = 0;
   private int miss = 0;
-  private int[] mem;
 
   public abstract void store(int address);
 
@@ -24,17 +24,18 @@ public abstract class Cache {
     this.sizeInKb = sizeInKb;
     this.blockSizeInWord = blockSizeInWord;
     this.totalIndex = this.sizeInKb * WORD_PER_KB / (this.blockSizeInWord * associativity);
-    this.mem = new int[totalIndex];
     this.tagShift  = 2 + getExponent(this.blockSizeInWord) + getExponent(totalIndex);
-  }
-
-  public boolean withinBlock(int index, int tag) {
-    return mem[index] == tag;
+    this.addressShift = 2 + getExponent(this.blockSizeInWord);
   }
 
   public int getTag(int address) {
-    address = address >> tagShift;
+    address = address >> this.tagShift;
     return address;
+  }
+
+  public int getIndex(int address) {
+    address = address >> addressShift;
+    return address & (totalIndex - 1);
   }
 
   private static int getExponent(int num) {
@@ -58,7 +59,7 @@ public abstract class Cache {
     miss++;
   }
 
-  public int getIndex() {
+  public int getTotalIndex() {
     return this.totalIndex;
   }
 
