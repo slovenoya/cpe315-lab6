@@ -1,16 +1,17 @@
-public class Cache {
-  private int blockSizeInWord;
-  private int blockSizeInBits;
-  private int sizeInWord; // count in word
-  private int associativity;
-  private int[][] mem;
-  private int maxIndex;
-  private int miss = 0;
-  private int hit = 0;
-  private final int LRU;
+public abstract class Cache {
   private static final int WORD_PER_KB = 256;
-  private static final int BITS_PER_WORD = 32;
   private static final int BYTE_PER_WORD = 4;
+  private static final int BYTES_PER_KB = WORD_PER_KB * BYTE_PER_WORD;
+  private int totalIndex;
+  private int blockSizeInWord;
+  private int sizeInKb;
+  private int tagShift;
+  private int associativity = 1;
+  private int hit = 0;
+  private int miss = 0;
+  private int[] mem;
+
+  public abstract void store(int address);
 
   /**
    * initialize the cache with all zeros
@@ -19,85 +20,56 @@ public class Cache {
    * @param blockSize number of words stored in each block
    * @param associativity parallel number in the cache
    */
-  public Cache(int sizeInKb, int blockSizeInWord, int associativity) {
-    this.sizeInWord = sizeInKb * WORD_PER_KB;
+  public Cache(int sizeInKb, int blockSizeInWord) {
+    this.sizeInKb = sizeInKb;
     this.blockSizeInWord = blockSizeInWord;
-    this.blockSizeInBits = blockSizeInWord * BITS_PER_WORD;
-    this.associativity = associativity;
-    this.LRU = associativity;
-    this.maxIndex = this.sizeInWord / (this.blockSizeInWord * associativity);
-    mem = new int[this.maxIndex][associativity + 1];
+    this.totalIndex = this.sizeInKb * WORD_PER_KB / (this.blockSizeInWord * associativity);
+    this.mem = new int[totalIndex];
+    this.tagShift  = 2 + getExponent(this.blockSizeInWord) + getExponent(totalIndex);
   }
 
-  /**
-   * return true if hit, false if miss
-   * @param address address to be stored
-   */
-  public void store(int address) {
-    int index = getIndex(address);
-    //first fill in the empty places
-    for (int i = 0; i < this.associativity; i++) {
-      if (mem[index][i] == 0) {
-        mem[index][i] = getStorageAddress(address);
-        mem[index][LRU] = i;
-        miss++;
-        return;
-      }
+  public boolean withinBlock(int index, int tag) {
+    return mem[index] == tag;
+  }
+
+  public int getTag(int address) {
+    address = address >> tagShift;
+    return address;
+  }
+
+  private static int getExponent(int num) {
+    int result = 0;
+    while (num != 0) {
+      num  = num >> 1;
+      result++;
     }
-    for (int i = 0; i < this.associativity; i++) {
-      if (isWithinBlock(index, address, i)) {
-        hit++;
-        mem[index] [LRU] = i;
-        return;
-      } 
-    }
-    int LRU = mem[index][this.LRU];
-    mem[index] [LRU] = getStorageAddress(address);
+    return result - 1;
+  }
+
+  public void setAssociativity(int associativity) {
+    this.associativity = associativity;
+  }
+
+  public void addHit() {
+    hit++;
+  }
+
+  public void addMiss() {
     miss++;
   }
 
-  public void storeDirect(int address) {
-    int index = getIndex(address);
-    if (isWithinBlock(index, address)) {
-      hit++;
-    } else {
-      miss++;
-      mem[index][0] = getStorageAddress(address);
-    }
+  public int getIndex() {
+    return this.totalIndex;
   }
 
-  /**
-   * return the index for the address to be stored
-   * address % index. Since index is a power of 2, use bit-wise calculation to reduce runtime
-   * @param address 32 bit address
-   * @return
-   */
-  private int getIndex(int address) {
-    return address & (maxIndex - 1);
-  }
-
-  /**
-   * return the address to be stored in the first row of cache. 
-   * e.g if cache is 4-word, and 15 will be stored as 12, if 1-word, 15 will be stored as 15
-   * 
-   * @param address
-   * @return address % blockSizeInWord * blockSizeInWord
-   */
-  private int getStorageAddress(int address) {
-    return address - (address & (this.blockSizeInWord - 1));
-  }
-
-  private boolean isWithinBlock(int index, int address, int associative) {
-    return address >= mem[index][associative] && address < mem[index][associative] + blockSizeInBits;
-  }
-
-  private boolean isWithinBlock (int index, int address) {
-    return address >= mem[index][0] && address < mem[index][0] + blockSizeInBits;
+  public int getAssociativity() {
+    return this.associativity;
   }
 
   public void printCache(int num) {
+    int sizeInByte = BYTES_PER_KB * sizeInKb;
     System.out.printf("Cache #%d\nCache size: %dB\tAssociativity: %d\tBlock size: %d\nHits: %d \t Hit Rate: %.2f", 
-      num, this.sizeInWord * BYTE_PER_WORD, this.associativity, this.blockSizeInWord, this.hit, 
+      num, sizeInByte, this.associativity, this.blockSizeInWord, this.hit, 
       (double)hit / (hit + miss) * 100);
     System.out.println("%\n---------------------------");
   }
