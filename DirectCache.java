@@ -1,7 +1,7 @@
 public class DirectCache extends Cache {
   int [] mem;
   public DirectCache (int sizeInKb, int blockSizeInWord)  {
-    super (sizeInKb, blockSizeInWord);
+    super (sizeInKb, blockSizeInWord, 1);
     this.mem = new int[super.getTotalIndex()];
   }
 

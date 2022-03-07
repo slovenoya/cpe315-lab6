@@ -20,7 +20,7 @@ public abstract class Cache {
    * @param blockSize number of words stored in each block
    * @param associativity parallel number in the cache
    */
-  public Cache(int sizeInKb, int blockSizeInWord) {
+  public Cache(int sizeInKb, int blockSizeInWord, int associativity) {
     this.sizeInKb = sizeInKb;
     this.blockSizeInWord = blockSizeInWord;
     this.totalIndex = this.sizeInKb * WORD_PER_KB / (this.blockSizeInWord * associativity);
@@ -38,6 +38,11 @@ public abstract class Cache {
     return address & (totalIndex - 1);
   }
 
+  /**
+   * return the exponent of an integer that is a power of 2 
+   * @param num an integer that is a power of 2
+   * @return
+   */
   private static int getExponent(int num) {
     int result = 0;
     while (num != 0) {

@@ -5,7 +5,7 @@ public class AssociativeCache extends Cache {
   private int LRUHist = 0;
 
   public AssociativeCache(int sizeInKb, int associativity, int blockSizeInWord) {
-    super (sizeInKb, blockSizeInWord);
+    super (sizeInKb, blockSizeInWord, associativity);
     super.setAssociativity(associativity);
     this.LRUTable = new int[super.getTotalIndex()][super.getAssociativity()];
     this.mem = new int[super.getTotalIndex()][super.getTotalIndex()];
